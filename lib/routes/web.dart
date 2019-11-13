@@ -1,10 +1,11 @@
+//import 'dart:html';
+
+import 'package:flutter_app/markdown/widget.dart';
 import 'package:html/dom.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:html/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html2md/html2md.dart' as html2md;
-import 'package:flutter_markdown/flutter_markdown.dart';
 
 class WebPage extends StatefulWidget {
   @override
@@ -17,16 +18,17 @@ class _WebPageState extends State<WebPage> {
 
   String parseUrl(String html) {
     Document document = parse(html);
-    var s = document.getElementById('content');
-    return s.outerHtml;
+    var content = document.getElementById('content');
+    return content.outerHtml;
   }
 
   void fetchHTML(String url) async {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       String content = parseUrl(response.body);
-      debugPrint(content);
-      String markdown = html2md.convert(content);
+//      debugPrint(content);
+      String markdown = html2md.convert(content, rootTag: 'article');
+//      debugPrint(markdown);
       setState(() {
         _markdownBody = markdown;
       });
@@ -43,6 +45,8 @@ class _WebPageState extends State<WebPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MarkdownBody(data: _markdownBody);
+    return SingleChildScrollView(
+      child: MarkdownBody(data: _markdownBody),
+    );
   }
 }
